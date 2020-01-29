@@ -4,7 +4,7 @@ import numpy as np #Used for loading nested array with pixel values
 
 
 csvpath=r"C:\Users\Akin\Desktop\AllSky_classified\index_training.csv" #Put csv file path as shown
-category=1 #1 for cloud only training , 2 for cirrus only training , 3 for both
+category=3 #1 for cloud only training , 2 for cirrus only training , 3 for both
 
 
 modstart=2000 #First image you want to start training on
@@ -72,9 +72,9 @@ def Predictor(csvpath,category,mod):
         predictions=clf1.predict(samples)
 
         for i in predictions:
-            if predictions[i]==col_a:
+            if predictions[i]==col_a[i]:
                 right=right+1
-            elif predictions[i]!=col_a:
+            elif predictions[i]!=col_a[i]:
                 wrong=wrong+1        
         print((right/(end-start))*100,"cloud")
         print((wrong/(end-start))*100,"cloud")
