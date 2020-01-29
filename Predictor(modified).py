@@ -56,8 +56,8 @@ def Predictor(csvpath,category,mod):
                 right=right+1
             elif predictions[i]!=col_a[i]:
                 wrong=wrong+1
-        print((right/(end-start))*100)
-        print((wrong/(end-start))*100)
+        print((right/(len(mod))))*100)
+        print((wrong/(len(mod))))*100)
     elif category==3:
         df = pd.read_csv (csvpath, header=0)
         col_a = list(df.eval("cloud"))
@@ -76,8 +76,8 @@ def Predictor(csvpath,category,mod):
                 right=right+1
             elif predictions[i]!=col_a[i]:
                 wrong=wrong+1        
-        print((right/(end-start))*100,"cloud")
-        print((wrong/(end-start))*100,"cloud")
+        print((right/(len(mod))))*100,"cloud")
+        print((wrong/(len(mod))))*100,"cloud")
 
         clf2 = load('cirrus.joblib')
         col_b=col_b[func] 
@@ -89,7 +89,7 @@ def Predictor(csvpath,category,mod):
                 right=right+1
             elif predictions[i]!=col_b[i]:
                 wrong=wrong+1        
-        print((right/(end-start))*100,"cloud")
-        print((wrong/(end-start))*100,"cloud")
+        print((right/(len(mod))))*100,"cloud")
+        print((wrong/(len(mod))))*100,"cloud")
 
 Predictor(csvpath,category,modfunc(modstart,modend,steps,size))
