@@ -4,15 +4,15 @@ import numpy as np #Used for loading nested array with pixel values
 from joblib import dump, load #Save trained machine learning algorithm
 
 csvpath=r"C:\Users\Akin\Desktop\AllSky_classified\index_training.csv" #Put csv file path as shown
-category=3 #1 for cloud only training , 2 for cirrus only training , 3 for both
+category=1 #1 for cloud only training , 2 for cirrus only training , 3 for both
 
 
-modstart=2000 #First image you want to start training on
-modend=8000 #Last image you want to finish training on
+modstart=0 #First image you want to start training on
+modend=100 #Last image you want to finish training on
 steps=200 #The size of the steps you want to take
 size=100 #The actual number of images you want to use everytime a step is taken , if steps and size are equal you wont be skipping out on images
 
-def modfunc(modstart,modend,steps,size) #Creates an array used for picking out the indicies of the images you want to use
+def modfunc(modstart,modend,steps,size): #Creates an array used for picking out the indicies of the images you want to use
     mod=[] #Need a modified array for choosing cloud trainers, they are all bunched to together
     modified=np.arange(modstart,modend,steps) #Creates the array used for selecting images
     for i in modified:
@@ -25,38 +25,49 @@ def MachineCreator(csvpath,category,mod):
     if category==1:
         df = pd.read_csv (csvpath, header=0) #Read csv file
         col_a = list(df.eval("cloud")) #Load target values for selected header
-        samples=np.load('imagedata.npy') #Load pixel data from every image
+        samples=np.load('imagedata.npz') #Load pixel data from every image
+        samples=samples["arr_0"] #Npz is for storing mutliple array so this takes out the first array , the only array
         clf=tree.DecisionTreeClassifier() #Decision tree type algorithm
-        func=slice(mod[0],mod[len(mod)-1]) #Creates slicing function used for picking images using the array created above
-        samples=samples[func] #Slices the samples array
-        col_a=col_a[func] #slices the result array to fit the samples array
-        clf=clf.fit(samples,col_a) #Fit data to target
-        dump(clf, 'cloud.joblib') #Save training algorithm
+        samples_m=[] #Array that is the sorted version of samples
+        col_m=[] #Array that is the sorted version of col_a
+        for i in mod: #Sorts samples and col_a with the indicies values from the mod function
+            samples_m.append(samples[i])
+            col_m.append(col_a[i])
+        clf=clf.fit(samples_m,col_m) #Fit data to target
+        dump(clf, ('cloud'+str(modstart)+'-'+str(modend)+','+str(steps)+','+str(size)+'.joblib')) #Save training algorithm with customised name
     elif category==2:
         df = pd.read_csv (csvpath, header=0)
         col_a = list(df.eval("cirrus")) 
-        samples=np.load('imagedata.npy')
+        samples=np.load('imagedata.npz')
+        samples=samples["arr_0"]
         clf=tree.DecisionTreeClassifier()
-        func=slice(mod[0],mod[len(mod)-1])
-        samples=samples[func]
-        col_a=col_a[func]
-        clf=clf.fit(samples,col_a)
-        dump(clf, 'cirrus.joblib')
+        samples_m=[]
+        col_m=[]
+        for i in mod:
+            samples_m.append(samples[i])
+            col_m.append(col_a[i])
+        clf=clf.fit(samples_m,col_m)
+        dump(clf, ('cirrus'+str(modstart)+'-'+str(modend)+','+str(steps)+','+str(size)+'.joblib'))
     elif category==3:
         df = pd.read_csv (csvpath, header=0)
         col_a = list(df.eval("cloud"))
         col_b = list(df.eval("cirrus"))
-        samples=np.load('imagedata.npy')
+        samples=np.load('imagedata.npz')
+        samples=samples["arr_0"]
         clf1=tree.DecisionTreeClassifier()
-        func=slice(mod[0],mod[len(mod)-1])
-        samples=samples[func]
-        col_a=col_a[func]
-        col_b=col_b[func]
-        clf1=clf1.fit(samples,col_a)
-        dump(clf1, 'cloud.joblib')
+        samples_m=[]
+        col_m=[]
+        col_n=[]
+        for i in mod:
+            samples_m.append(samples[i])
+            col_m.append(col_a[i])
+            col_n.append(col_b[i])
+        
+        clf1=clf1.fit(samples_m,col_m)
+        dump(clf1, ('cloud'+str(modstart)+'-'+str(modend)+','+str(steps)+','+str(size)+'.joblib'))
         clf2=tree.DecisionTreeClassifier()
-        clf2=clf2.fit(samples,col_b)
-        dump(clf2, 'cirrus.joblib')
+        clf2=clf2.fit(samples_m,col_n)
+        dump(clf2, ('cirrus'+str(modstart)+'-'+str(modend)+','+str(steps)+','+str(size)+'.joblib'))
 
 
 

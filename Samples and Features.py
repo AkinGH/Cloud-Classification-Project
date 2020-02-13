@@ -5,7 +5,7 @@ from PIL import Image, ImageDraw #Used for opening images easily
 
 length=470 #Put in the length of your images here
 width=470 #Put in the width of your image here
-numofimg=3290 #The number of images to store the pixel data of
+numofimg=13087 #The number of images to store the pixel data of
 a = glob.glob(r'C:\Users\Akin\Desktop\Converted\*.png') #Put file path as shown, including the *
 
 def PixelStorer(length,width,numofimg,a):
@@ -26,7 +26,7 @@ def PixelStorer(length,width,numofimg,a):
                 pixels[z]=npImage[x,y,1] #Takes out the pixel gamma value for each pixel and stores in this array
                 z=z+1 #Cycles to next      
 
-    np.save('imagedata.npy', samples) #Saves the nested array required for the machine learning algorithm
+    np.savez_compressed('imagedata.npz', samples) #Saves the nested array required for the machine learning algorithm
 
 PixelStorer(length,width,numofimg,a)
     
